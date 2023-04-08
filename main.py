@@ -88,7 +88,7 @@ order by (symbol)
     #Query for performance metrics
     query_performance_metrics = '''Select transaction_id,total_return,annualized_return,risk_level from performance_metrics NATURAL JOIN transaction_history
     where username = %s 
-    order by transaction_id LIMIT 4; '''
+    order by transaction_id; '''
 
     cur.execute(query_performance_metrics, user)
     performance_metrics = cur.fetchall()
@@ -178,7 +178,19 @@ def list_to_json(listToConvert):
     json_format['labels'] = keys
     return [json_format]
 
-
+@app.route('/delete_transaction.html', methods=['GET', 'POST'])
+def delete_transaction():
+    cur = mysql.connection.cursor()
+    if request.method == 'POST':
+        transaction_details = request.form
+        transaction_id = transaction_details['transaction_id']
+        cur = mysql.connection.cursor()
+        query1 = '''delete from performance_metrics where transaction_id=%s'''
+        query2 = '''delete from transaction_history where transaction_id=%s'''
+        cur.execute(query1, transaction_id)
+        cur.execute(query2, transaction_id)
+        mysql.connection.commit()
+    return render_template('delete_transaction.html')
 @app.route('/add_transaction.html', methods=['GET', 'POST'])
 def add_transaction():
 

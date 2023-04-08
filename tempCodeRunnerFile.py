@@ -1,1 +1,1 @@
-portfolio
+    if "user" not in session:
