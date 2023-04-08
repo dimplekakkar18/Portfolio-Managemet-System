@@ -197,12 +197,27 @@ def add_transaction():
         if transaction_type == 'Sell':
             quantity = -quantity
 
-        cur = mysql.connection.cursor()
-        query = '''insert into transaction_history(username, symbol, transaction_date, quantity, rate) values
+        try:
+            cur = mysql.connection.cursor()
+            query1 = '''insert into transaction_history(username, symbol, transaction_date, quantity, rate) values
 (%s, %s, %s, %s, %s)'''
-        values = [session['user'], symbol, date, quantity, rate]
-        cur.execute(query, values)
-        mysql.connection.commit()
+            values = [session['user'], symbol, date, quantity, rate]
+            cur.execute(query1, values)
+            mysql.connection.commit()
+            cur = mysql.connection.cursor()
+            query2 = '''select max(transaction_id) from transaction_history'''
+            cur.execute(query2)
+            number = cur.fetchall()[0]
+
+            query3 = ''' insert into performance_metrics(total_return, annualized_return, risk_level) values
+(((((SELECT rate from transaction_history where transaction_id = %s) -((SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))))/(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))*100,
+if(((((SELECT rate from transaction_history where transaction_id = %s) -((SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))))/(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))*100>0,(power(1+(((SELECT rate from transaction_history where transaction_id = %s) -(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s))))/(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s))*100,365/(datediff('2023-04-10',(SELECT transaction_date from transaction_history where transaction_id=%s))))-1)*100,0),
+(select stddev(LTP) from historical_data where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))'''
+            values = [number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0]]
+            cur.execute(query3,values)
+            mysql.connection.commit()
+        except:
+            return render_template('alert3.html')
 
     return render_template('add_transaction.html', companies=companies)
 
