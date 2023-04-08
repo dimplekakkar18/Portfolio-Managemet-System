@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock News</title>
+    <title>Financial Info</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -15,29 +15,27 @@
 </head>
 
 <body>
+
     <nav class="navbar" style="background-color:rgb(18, 62, 105);">
         <div class="container-fluid">
             <a class="navbar-brand">
-                Stock News
+               Financial Info
             </a>
-            <form class="d-flex">
+            <!-- <form class="d-flex">
                 <input class="form-control me-2" type="search" placeholder="Search Symbol..." aria-label="Search">
-            </form>
+            </form> -->
         </div>
     </nav>
 
-<br>
-<marquee onmouseover="this.stop();" onmouseout="this.start();"><h3
-    style="color:rgb(18, 236, 164); font-size:xx-large ;">Breaking news here!!!</h3></marquee>
+
     <div class="table-responsive justify-content-center float-center">
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th scope="col">Date Posted</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Related Company</th>
-                    <th scope="col">Related Sector</th>
-                    <th scope="col">Sources</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Interest Rate</th>
+                    <th scope="col">Inflation Rate (in %)</th>
+                    <th scope="col">GDP Growth Rate (in %)</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,32 +45,31 @@
                     <td> {{items[1]}} </td>
                     <td> {{items[2]}} </td>
                     <td> {{items[3]}} </td>
-                    <td> {{items[4]}} </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <!--js-->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-    <script>
-        $(document).ready(function () {
-            $(".form-control").on("keyup", function () {
-                var value = $(this).val().toLowerCase();
-                $(".table tbody tr").filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                });
-            });
-        });
-    </script>
+  <!--js-->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+  crossorigin="anonymous"></script>
+<script>
+  $(document).ready(function () {
+      $(".form-control").on("keyup", function () {
+          var value = $(this).val().toLowerCase();
+          $(".table tbody tr").filter(function () {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+      });
+  });
+</script>
     <!-- FOOTER -->
     <footer class="container">
         Quick Links

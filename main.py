@@ -316,21 +316,27 @@ order by(symbol);
     rv = cur.fetchall()
     return render_template('companyprofile.html', values=rv)
 
-
-@app.route('/dividend.html')
-def dividend_history(company='all'):
+@app.route('/financial.html')
+def financial_info():
     cur = mysql.connection.cursor()
-    if company == 'all':
-        query = '''select * from dividend_history
-order by(symbol);
-'''
-        cur.execute(query)
-    else:
-        company = [company]
-        query = '''select * from dividend_history where company = %s'''
-        cur.execute(query, company)
+    query = '''select * from financial_info'''
+    cur.execute(query)
     rv = cur.fetchall()
-    return render_template('dividend.html', values=rv)
+    return render_template('financial.html', values=rv)
+# @app.route('/dividend.html')
+# def dividend_history(company='all'):
+#     cur = mysql.connection.cursor()
+#     if company == 'all':
+#         query = '''select * from dividend_history
+# order by(symbol);
+# '''
+#         cur.execute(query)
+#     else:
+#         company = [company]
+#         query = '''select * from dividend_history where company = %s'''
+#         cur.execute(query, company)
+#     rv = cur.fetchall()
+#     return render_template('dividend.html', values=rv)
 
 
 @app.route('/watchlist.html')
