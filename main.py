@@ -178,8 +178,8 @@ def list_to_json(listToConvert):
     json_format['labels'] = keys
     return [json_format]
 
-@app.route('/filtered.html')
-def filtered():
+@app.route('/filtered1.html')
+def filtered1():
     # Check if we have logged in users
 
     if "user" not in session:
@@ -189,9 +189,34 @@ def filtered():
     query = '''SELECT symbol, company_name, LTP, sector, quantity, risk_level from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by risk_level LIMIT 5;'''
     cur.execute(query);
     data = cur.fetchall()
-    return render_template('filtered.html', user=user[0], data=data)
+    return render_template('filtered1.html', user=user[0], data=data)
 
+@app.route('/filtered2.html')
+def filtered2():
+    # Check if we have logged in users
 
+    if "user" not in session:
+        return render_template('alert1.html')
+    user = [session['user']]
+    cur = mysql.connection.cursor()
+    query = '''SELECT symbol, company_name, LTP, sector, quantity, annualized_return from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by -annualized_return, risk_level LIMIT 5;'''
+    cur.execute(query);
+    data = cur.fetchall()
+    return render_template('filtered2.html', user=user[0], data=data)
+
+@app.route('/filtered3.html')
+def filtered3():
+    # Check if we have logged in users
+
+    if "user" not in session:
+        return render_template('alert1.html')
+    user = [session['user']]
+    cur = mysql.connection.cursor()
+    query = '''SELECT symbol, sector, avg(annualized_return) from company_profile NATURAL JOIN performance_metrics NATURAL JOIN transaction_history group by sector;
+'''
+    cur.execute(query);
+    data = cur.fetchall()
+    return render_template('filtered3.html', user=user[0], data=data)
 
 @app.route('/delete_transaction.html', methods=['GET', 'POST'])
 def delete_transaction():

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/font-awesome/css/font-awesome.min.css">
+<style>
+    button.btn a{
+        color:azure;
+    }
+</style>
+
+</head>
+
+
+<body>
+    <nav class="navbar navbar-expand-xl navbar-dark" style="background-color:rgb(10, 44, 117);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-normal text-center" href="#">{{user}}'s Portfolio</a>         
+        </div>
+    </nav>
+
+    <h1 style="color: rgb(119, 9, 101); text-align: center;">Welcome {{user}}! </h1>
+    <br><h2 style="color:rgb(2, 0, 10); font-size:x-large ; text-align: center;">Your Current Investments Filtered By Risk:
+    </h2>
+    
+    <br>
+    <div class="table-responsive justify-content-center float-center">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">LTP</th>
+                    <th scope="col">Sector</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Risk_level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for holds in data %}
+                <tr>
+                    <td> {{holds[0]}} </td>
+                    <td> {{holds[1]}} </td>
+                    <td> {{holds[2]}} </td>
+                    <td> {{holds[3]}} </td>
+                    <td> {{holds[4]}} </td>
+                    <td> {{holds[5]}} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <center><h3><a href="portfolio.html">Go back!</a></h3></center>
+</body>
+</html>
+
