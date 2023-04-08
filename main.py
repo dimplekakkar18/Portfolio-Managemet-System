@@ -73,7 +73,8 @@ def portfolio():
     # Query for holdings
     cur = mysql.connection.cursor()
     user = [session['user']]
-    cur.callproc('portfolio', user)
+    query = '''SELECT symbol, company_name, LTP, sector, quantity from transaction_history NATURAL JOIN company_profile NATURAL JOIN company_price where username = %s;'''
+    cur.execute(query, user)
     holdings = cur.fetchall()
 
     # Query for watchlist
