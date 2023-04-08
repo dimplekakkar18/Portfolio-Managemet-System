@@ -178,6 +178,21 @@ def list_to_json(listToConvert):
     json_format['labels'] = keys
     return [json_format]
 
+@app.route('/filtered.html')
+def filtered():
+    # Check if we have logged in users
+
+    if "user" not in session:
+        return render_template('alert1.html')
+    user = [session['user']]
+    cur = mysql.connection.cursor()
+    query = '''SELECT symbol, company_name, LTP, sector, quantity, risk_level from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by risk_level LIMIT 5;'''
+    cur.execute(query);
+    data = cur.fetchall()
+    return render_template('filtered.html', user=user[0], data=data)
+
+
+
 @app.route('/delete_transaction.html', methods=['GET', 'POST'])
 def delete_transaction():
     cur = mysql.connection.cursor()
@@ -191,6 +206,7 @@ def delete_transaction():
         cur.execute(query2, transaction_id)
         mysql.connection.commit()
     return render_template('delete_transaction.html')
+
 @app.route('/add_transaction.html', methods=['GET', 'POST'])
 def add_transaction():
 
@@ -266,13 +282,13 @@ def current_price(company='all'):
     cur = mysql.connection.cursor()
     if company == 'all':
         query = '''SELECT date, symbol, LTP, PC FROM historical_data
-order by symbol;
+order by date;
 '''
         cur.execute(query)
     else:
         company = [company]
         query = '''SELECT date, symbol, LTP, PC FROM historical_data
-        where symbol = %s;
+        where symbol = %s order by date;
 '''
         cur.execute(query, company)
     rv = cur.fetchall()
