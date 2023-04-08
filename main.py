@@ -86,7 +86,7 @@ order by (symbol)
     cur.execute(query_watchlist, user)
     watchlist = cur.fetchall()
     #Query for performance metrics
-    query_performance_metrics = '''Select transaction_id,total_return,annualized_return,risk_level from performance_metrics NATURAL JOIN transaction_history
+    query_performance_metrics = '''Select symbol,total_return,annualized_return,risk_level from performance_metrics NATURAL JOIN transaction_history
     where username = %s 
     order by transaction_id; '''
 
