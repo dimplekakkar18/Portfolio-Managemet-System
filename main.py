@@ -212,7 +212,7 @@ def filtered3():
         return render_template('alert1.html')
     user = [session['user']]
     cur = mysql.connection.cursor()
-    query = '''SELECT symbol, sector, avg(annualized_return) from company_profile NATURAL JOIN performance_metrics NATURAL JOIN transaction_history group by sector;
+    query = '''SELECT symbol, sector, avg(annualized_return), sum(quantity) from company_profile NATURAL JOIN performance_metrics NATURAL JOIN transaction_history group by sector;
 '''
     cur.execute(query);
     data = cur.fetchall()
