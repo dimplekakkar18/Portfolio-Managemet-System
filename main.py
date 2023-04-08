@@ -86,7 +86,7 @@ order by (symbol)
     cur.execute(query_watchlist, user)
     watchlist = cur.fetchall()
     #Query for performance metrics
-    query_performance_metrics = '''Select symbol,total_return,annualized_return,risk_level from performance_metrics NATURAL JOIN transaction_history
+    query_performance_metrics = '''Select symbol,total_return,annualized_return,risk_level,risk_level*sqrt((datediff('2023-04-10',(SELECT transaction_date from transaction_history where transaction_id=1))/365)) from performance_metrics NATURAL JOIN transaction_history
     where username = %s 
     order by transaction_id; '''
 
@@ -146,7 +146,12 @@ group by C.sector;
     piechart_dict[0]['type'] = 'pie'
     piechart_dict[0]['hole'] = 0.4
 
-    return render_template('portfolio.html', holdings=holdings, user=user[0], suggestions=suggestions, eps=eps, pe=pe, technical=technical, watchlist=watchlist, piechart=piechart_dict, performance_metrics=performance_metrics
+    #Query for Portfolio's Annualized return
+    quere_ar = ''' SELECT( (SELECT sum(annualized_return*quantity) from performance_metrics NATURAL JOIN transaction_history) / (SELECT sum(quantity) from transaction_history)) as Annual_return_of_portfolio;
+'''
+    cur.execute(quere_ar)
+    port_ar = cur.fetchall()
+    return render_template('portfolio.html', holdings=holdings, user=user[0], suggestions=suggestions, eps=eps, pe=pe, technical=technical, watchlist=watchlist, piechart=piechart_dict, performance_metrics=performance_metrics, port_ar = port_ar
 )
 
 

@@ -112,7 +112,7 @@
                 <th scope="col">Total return</th>
                 <th scope="col">Annualized Return</th>
                 <th scope="col">Risk Level</th>
-                <!-- <th scope="col">CH %</th> -->
+                <th scope="col">Volatility</th>
             </tr>
         </thead>
         <tbody>
@@ -122,10 +122,14 @@
                 <td> {{metrics[1]}} </td>
                 <td> {{metrics[2]}} </td>
                 <td> {{metrics[3]}} </td>
+                <td> {{metrics[4]}} </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <div>
+        <p><strong>Annualized Return of Portfolio:</strong>{{port_ar[0][0]}}</p>
+    </div>
     <br>
 
     <br> <br>
