@@ -371,10 +371,15 @@ order by(symbol);
     return render_template('companyprofile.html', values=rv)
 
 @app.route('/financial.html')
-def financial_info():
+def financial_info(date='all'):
     cur = mysql.connection.cursor()
-    query = '''select * from financial_info'''
-    cur.execute(query)
+    if date == 'all':
+        query = '''select * from financial_info'''
+        cur.execute(query)
+    else:
+        date = [date]
+        query = '''select * from financial_info where date = %s'''
+        cur.execute(query, date)
     rv = cur.fetchall()
     return render_template('financial.html', values=rv)
 # @app.route('/dividend.html')
