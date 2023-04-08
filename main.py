@@ -237,13 +237,13 @@ where username = %s);
 def current_price(company='all'):
     cur = mysql.connection.cursor()
     if company == 'all':
-        query = '''SELECT symbol, LTP, PC, round((LTP-PC), 2) as CH, round(((LTP-PC)/PC)*100, 2) AS CH_percent FROM company_price
+        query = '''SELECT date, symbol, LTP, PC FROM historical_data
 order by symbol;
 '''
         cur.execute(query)
     else:
         company = [company]
-        query = '''SELECT symbol, LTP, PC, round((LTP-PC), 2) as CH, round(((LTP-PC)/PC)*100, 2) AS CH_percent FROM company_price
+        query = '''SELECT date, symbol, LTP, PC FROM historical_data
         where symbol = %s;
 '''
         cur.execute(query, company)
@@ -370,4 +370,3 @@ group by(title);
 
 if __name__ == '__main__':
     app.run(debug=True)
-# i love momo
