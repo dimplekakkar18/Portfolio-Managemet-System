@@ -73,7 +73,7 @@ def portfolio():
     # Query for holdings
     cur = mysql.connection.cursor()
     user = [session['user']]
-    query = '''SELECT symbol, company_name, LTP, sector, quantity, quantity*(LTP) from transaction_history NATURAL JOIN company_profile NATURAL JOIN company_price where username = %s;'''
+    query = '''SELECT transaction_id, symbol, company_name, LTP, sector, quantity, quantity*(LTP) from transaction_history NATURAL JOIN company_profile NATURAL JOIN company_price where username = %s;'''
     cur.execute(query, user)
     holdings = cur.fetchall()
 
@@ -326,6 +326,22 @@ def perrch_by_date():
         rv = cur.fetchall()
         return render_template('filtered5.html', values=rv)
     return render_template('perch_by_date.html', companies=companies)
+
+@app.route('/calc_correl.html', methods=['GET', 'POST'])
+def calc_correl():
+
+    if request.method == 'POST':
+        calc_correl_details = request.form
+        ID1 = calc_correl_details['transaction_id1']
+        ID2 = calc_correl_details['transaction_id2']
+        cur = mysql.connection.cursor()
+        query = '''SELECT((SELECT avg(A - (SELECT Avg(A) from (SELECT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SELECT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SELECT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab))
+* avg(B - (SELECT avg(B) from (SELECT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SELECT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SELECT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab)) from (SELECT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SELECT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SELECT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab) / (SELECT risk_level from performance_metrics where transaction_id = %s)*(SELECT risk_level from performance_metrics where transaction_id = %s)) as correlation;'''
+        values = [ID1, ID2, ID1, ID2, ID1, ID2, ID1, ID2]
+        cur.execute(query, values)
+        rv = cur.fetchall()
+        return render_template('correl.html', values=rv)
+    return render_template('calc_correl.html')
 
 @app.route('/add_watchlist.html', methods=['GET', 'POST'])
 def add_watchlist():

@@ -41,6 +41,8 @@
             Filter4</a></button>
     <button type="button" class="btn btn-primary float-left"><a href="perch_by_date.html">
             %ch</a></button>
+    <button type="button" class="btn btn-primary float-left"><a href="calc_correl.html">
+            correl</a></button>
     <button class="btn btn-success float-right"><a href="add_transaction.html">Add New
             transaction?</a></button>
     <button class="btn btn-danger float-right"><a href="delete_transaction.html">Delete
@@ -51,6 +53,7 @@
         <table class="table table-sm">
             <thead>
                 <tr>
+                    <th scope="col">Transaction_ID</th>
                     <th scope="col">Symbol</th>
                     <th scope="col">Name</th>
                     <th scope="col">LTP</th>
@@ -68,6 +71,7 @@
                     <td> {{holds[3]}} </td>
                     <td> {{holds[4]}} </td>
                     <td> {{holds[5]}} </td>
+                    <td> {{holds[6]}} </td>
                 </tr>
                 {% endfor %}
             </tbody>
