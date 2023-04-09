@@ -118,6 +118,7 @@ order by eps;'''
     eps = cur.fetchall()
 
     # Query on PE Ratio
+
     query_pe = '''select symbol, ltp, pe_ratio from fundamental_averaged
 where pe_ratio <30;'''
     cur.execute(query_pe)
@@ -302,6 +303,29 @@ def filter_by_date():
         rv = cur.fetchall()
         return render_template('filtered4.html', values=rv)
     return render_template('filter_by_date.html', companies=companies)
+
+@app.route('/perch_by_date.html', methods=['GET', 'POST'])
+def perrch_by_date():
+
+    # Query for all companies (for drop down menu)
+    cur = mysql.connection.cursor()
+    query_companies = '''select symbol from company_profile'''
+    cur.execute(query_companies)
+    companies = cur.fetchall()
+
+    if request.method == 'POST':
+        perch_by_date_details = request.form
+        symbol = perch_by_date_details['symbol']
+        min_date = perch_by_date_details['transaction_date_min']
+        max_date = perch_by_date_details['transaction_date_max']
+        cur = mysql.connection.cursor()
+        query = '''SELECT symbol, ((((SELECT LTP from historical_data where date = %s and symbol = %s) -(SELECT LTP from historical_data B where date = %s and symbol = %s) )/(SELECT LTP from historical_data B where date = %s and symbol = %s))*100)  FROM company_profile
+        where symbol = %s'''
+        values = [max_date, symbol, min_date, symbol, min_date, symbol, symbol]
+        cur.execute(query, values)
+        rv = cur.fetchall()
+        return render_template('filtered5.html', values=rv)
+    return render_template('perch_by_date.html', companies=companies)
 
 @app.route('/add_watchlist.html', methods=['GET', 'POST'])
 def add_watchlist():

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Data</title>
+    <title>Percentage Change</title>
 </head>
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -17,22 +17,16 @@
     <nav class="navbar" style="background-color:rgb(18, 62, 105);">
         <div class="container-fluid">
             <a class="navbar-brand ">
-                Stock Price
+                Percentage Change
             </a>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search Symbol..."
-                    aria-label="Search">               
-            </form>
         </div>
     </nav>
     <div class="table-responsive">
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th scope="col">Date</th>
                     <th scope="col">Symbol</th>
-                    <th scope="col">LTP</th>
-                    <th scope="col">PC</th>
+                    <th scope="col">Percentage Change</th>
                     <!-- <th scope="col">CH %</th> -->
                 </tr>
             </thead>
@@ -41,8 +35,6 @@
                 <tr>
                     <td> {{items[0]}} </td>
                     <td> {{items[1]}} </td>
-                    <td> {{items[2]}} </td>
-                    <td> {{items[3]}} </td>
                 </tr>
                 {% endfor %}
             </tbody>

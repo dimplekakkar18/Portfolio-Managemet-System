@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filter by date</title>
+    <title>Caclulate change</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/style.css">
     <link rel="stylesheet" href="../static/font-awesome/css/font-awesome.min.css">
@@ -24,7 +24,7 @@
     }
 </style>
 <body>
-    <center><h1>Filter by date</h1></center>
+    <center><h1>Calculate % Change</h1></center>
     <main class="container my-5" style="width: 50%; height:fit-content; float: center; justify-content: center; text-align: left; margin: 25%; padding: 2.5rem;"><h2>
         <form method="POST" action=''>
             Symbol:
@@ -34,12 +34,12 @@
                 {% endfor %}
             </select>
             <br><br>
-             Transaction Date MIN: <input type="date" name='transaction_date_min' />
+             Lower Date: <input type="date" name='transaction_date_min' />
             <br><br>
             <br><br>
-             Transaction Date MAX: <input type="date" name='transaction_date_max' />
+             Higher Date: <input type="date" name='transaction_date_max' />
             <br><br>
-          <input type="submit" value="Filter" href="filtered4.html" style="float:left">
+          <input type="submit" value="Calculate" href="filtered5.html" style="float:left">
         </form>
     </main>
          <center><h3><a href="portfolio.html">Go back!</a></h3></center>
