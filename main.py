@@ -352,6 +352,30 @@ where username = %s);
         mysql.connection.commit()
     return render_template('add_watchlist.html', companies=companies)
 
+@app.route('/delete_watchlist.html', methods=['GET', 'POST'])
+def delete_watchlist():
+
+    # Query for companies (for drop down menu) which are already in watchlist
+    cur = mysql.connection.cursor()
+    query_companies = '''SELECT symbol from company_profile
+where symbol in
+(select symbol from watchlist
+where username = %s);
+'''
+    user = [session['user']]
+    cur.execute(query_companies, user)
+    companies = cur.fetchall()
+
+    if request.method == 'POST':
+        watchlist_details = request.form
+        symbol = watchlist_details['symbol']
+        cur = mysql.connection.cursor()
+        query = '''delete from watchlist where username = %s AND symbol = %s'''
+        values = [user, symbol]
+        cur.execute(query, values)
+        mysql.connection.commit()
+    return render_template('delete_watchlist.html', companies=companies)
+
 @app.route('/stockprice.html')
 def current_price(company='all'):
     cur = mysql.connection.cursor()
