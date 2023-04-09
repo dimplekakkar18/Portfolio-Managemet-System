@@ -280,6 +280,28 @@ if(((((SELECT rate from transaction_history where transaction_id = %s) -((SELECT
 
     return render_template('add_transaction.html', companies=companies)
 
+@app.route('/filter_by_date.html', methods=['GET', 'POST'])
+def filter_by_date():
+
+    # Query for all companies (for drop down menu)
+    cur = mysql.connection.cursor()
+    query_companies = '''select symbol from company_profile'''
+    cur.execute(query_companies)
+    companies = cur.fetchall()
+
+    if request.method == 'POST':
+        filter_by_date_details = request.form
+        symbol = filter_by_date_details['symbol']
+        min_date = filter_by_date_details['transaction_date_min']
+        max_date = filter_by_date_details['transaction_date_max']
+        cur = mysql.connection.cursor()
+        query = '''SELECT date, symbol, LTP, PC FROM historical_data
+        where symbol = %s AND date BETWEEN %s and %s order by date'''
+        values = [symbol, min_date, max_date]
+        cur.execute(query, values)
+        rv = cur.fetchall()
+        return render_template('filtered4.html', values=rv)
+    return render_template('filter_by_date.html', companies=companies)
 
 @app.route('/add_watchlist.html', methods=['GET', 'POST'])
 def add_watchlist():
@@ -304,7 +326,6 @@ where username = %s);
         values = [session['user'], symbol]
         cur.execute(query, values)
         mysql.connection.commit()
-
     return render_template('add_watchlist.html', companies=companies)
 
 @app.route('/stockprice.html')
