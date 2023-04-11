@@ -86,7 +86,7 @@ order by (symbol)
     cur.execute(query_watchlist, user)
     watchlist = cur.fetchall()
     #Query for performance metrics
-    query_performance_metrics = '''Select symbol,total_return,annualized_return,risk_level,risk_level*sqrt((datediff('2023-04-10',(SELECT transaction_date from transaction_history where transaction_id=1))/365)) from performance_metrics NATURAL JOIN transaction_history
+    query_performance_metrics = '''Select symbol,total_return,annualized_return,risk_level,risk_level*sqrt((datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=1))/365)) from performance_metrics NATURAL JOIN transaction_history
     where username = %s 
     order by transaction_id; '''
 
@@ -148,7 +148,7 @@ group by C.sector;
     piechart_dict[0]['hole'] = 0.4
 
     #Query for Portfolio's Annualized return
-    quere_ar = ''' SELECT( (SELECT sum(annualized_return*quantity) from performance_metrics NATURAL JOIN transaction_history) / (SELECT sum(quantity) from transaction_history)) as Annual_return_of_portfolio;
+    quere_ar = ''' SElecT( (SElecT sum(annualized_return*quantity) from performance_metrics NATURAL JOIN transaction_history) / (SElecT sum(quantity) from transaction_history)) as Annual_return_of_portfolio;
 '''
     cur.execute(quere_ar)
     port_ar = cur.fetchall()
@@ -192,7 +192,7 @@ def filtered1():
         return render_template('alert1.html')
     user = [session['user']]
     cur = mysql.connection.cursor()
-    query = '''SELECT symbol, company_name, LTP, sector, quantity, risk_level from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by risk_level LIMIT 5;'''
+    query = '''SElecT symbol, company_name, LTP, sector, quantity, risk_level from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by risk_level LIMIT 5;'''
     cur.execute(query);
     data = cur.fetchall()
     return render_template('filtered1.html', user=user[0], data=data)
@@ -205,7 +205,7 @@ def filtered2():
         return render_template('alert1.html')
     user = [session['user']]
     cur = mysql.connection.cursor()
-    query = '''SELECT symbol, company_name, LTP, sector, quantity, annualized_return from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by -annualized_return, risk_level LIMIT 5;'''
+    query = '''SElecT symbol, company_name, LTP, sector, quantity, annualized_return from company_price NATURAL JOIN company_profile NATURAL JOIN transaction_history NATURAL JOIN performance_metrics order by -annualized_return, risk_level LIMIT 5;'''
     cur.execute(query);
     data = cur.fetchall()
     return render_template('filtered2.html', user=user[0], data=data)
@@ -218,7 +218,7 @@ def filtered3():
         return render_template('alert1.html')
     user = [session['user']]
     cur = mysql.connection.cursor()
-    query = '''SELECT symbol, sector, avg(annualized_return), sum(quantity) from company_profile NATURAL JOIN performance_metrics NATURAL JOIN transaction_history group by sector;
+    query = '''SElecT symbol, sector, avg(annualized_return), sum(quantity) from company_profile NATURAL JOIN performance_metrics NATURAL JOIN transaction_history group by sector;
 '''
     cur.execute(query);
     data = cur.fetchall()
@@ -231,10 +231,11 @@ def delete_transaction():
         transaction_details = request.form
         transaction_id = transaction_details['transaction_id']
         cur = mysql.connection.cursor()
+        print(transaction_id)
         query1 = '''delete from performance_metrics where transaction_id=%s'''
         query2 = '''delete from transaction_history where transaction_id=%s'''
-        cur.execute(query1, transaction_id)
-        cur.execute(query2, transaction_id)
+        cur.execute("delete from performance_metrics where transaction_id=%s",[transaction_id])
+        cur.execute("delete from transaction_history where transaction_id=%s",[transaction_id])
         mysql.connection.commit()
     return render_template('delete_transaction.html')
 
@@ -268,15 +269,23 @@ def add_transaction():
             query2 = '''select max(transaction_id) from transaction_history'''
             cur.execute(query2)
             number = cur.fetchall()[0]
-
-            query3 = ''' insert into performance_metrics(total_return, annualized_return, risk_level) values
-(((((SELECT rate from transaction_history where transaction_id = %s) -((SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))))/(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))*100,
-if(((((SELECT rate from transaction_history where transaction_id = %s) -((SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))))/(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))*100>0,(power(1+(((SELECT rate from transaction_history where transaction_id = %s) -(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s))))/(SELECT LTP from company_price where symbol = (SELECT symbol from transaction_history where transaction_id=%s))*100,365/(datediff('2023-04-10',(SELECT transaction_date from transaction_history where transaction_id=%s))))-1)*100,0),
-(select stddev(LTP) from historical_data where symbol = (SELECT symbol from transaction_history where transaction_id=%s)))'''
-            values = [number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0]]
+            query3 = '''insert into performance_metrics(transaction_id,total_return, annualized_return, risk_level) values
+(%s,((((SElecT rate from transaction_history where transaction_id = %s) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=%s)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=%s)))*100,
+if(((((SElecT rate from transaction_history where transaction_id = %s) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=%s)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=%s)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = %s) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=%s))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=%s))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=%s))))-1)*100,0),
+(select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=%s)));'''
+            values = [number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0],number[0]]
             cur.execute(query3,values)
             mysql.connection.commit()
         except:
+            query2 = '''select max(transaction_id) from transaction_history'''
+            cur = mysql.connection.cursor()
+            cur.execute(query2)
+            number = cur.fetchall()[0]
+            query = '''delete from transaction_history where transaction_id=%s'''
+            values = [number[0]]
+            cur.execute(query,values)
+            mysql.connection.commit()
+            print(number[0])
             return render_template('alert3.html')
 
     return render_template('add_transaction.html', companies=companies)
@@ -296,7 +305,7 @@ def filter_by_date():
         min_date = filter_by_date_details['transaction_date_min']
         max_date = filter_by_date_details['transaction_date_max']
         cur = mysql.connection.cursor()
-        query = '''SELECT date, symbol, LTP, PC FROM historical_data
+        query = '''SElecT date, symbol, LTP, PC FROM historical_data
         where symbol = %s AND date BETWEEN %s and %s order by date'''
         values = [symbol, min_date, max_date]
         cur.execute(query, values)
@@ -319,7 +328,7 @@ def perrch_by_date():
         min_date = perch_by_date_details['transaction_date_min']
         max_date = perch_by_date_details['transaction_date_max']
         cur = mysql.connection.cursor()
-        query = '''SELECT symbol, ((((SELECT LTP from historical_data where date = %s and symbol = %s) -(SELECT LTP from historical_data B where date = %s and symbol = %s) )/(SELECT LTP from historical_data B where date = %s and symbol = %s))*100)  FROM company_profile
+        query = '''SElecT symbol, ((((SElecT LTP from historical_data where date = %s and symbol = %s) -(SElecT LTP from historical_data B where date = %s and symbol = %s) )/(SElecT LTP from historical_data B where date = %s and symbol = %s))*100)  FROM company_profile
         where symbol = %s'''
         values = [max_date, symbol, min_date, symbol, min_date, symbol, symbol]
         cur.execute(query, values)
@@ -335,8 +344,8 @@ def calc_correl():
         ID1 = calc_correl_details['transaction_id1']
         ID2 = calc_correl_details['transaction_id2']
         cur = mysql.connection.cursor()
-        query = '''SELECT((SELECT avg(A - (SELECT Avg(A) from (SELECT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SELECT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SELECT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab))
-* avg(B - (SELECT avg(B) from (SELECT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SELECT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SELECT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab)) from (SELECT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SELECT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SELECT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab) / (SELECT risk_level from performance_metrics where transaction_id = %s)*(SELECT risk_level from performance_metrics where transaction_id = %s)) as correlation;'''
+        query = '''SElecT((SElecT avg(A - (SElecT Avg(A) from (SElecT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SElecT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SElecT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab))
+* avg(B - (SElecT avg(B) from (SElecT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SElecT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SElecT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab)) from (SElecT C.LTP as A, D.LTP as B from historical_data C, historical_data D where C.symbol = (SElecT symbol as symA from transaction_history where transaction_id = %s) AND D.symbol = (SElecT symbol as symB from transaction_history where transaction_id = %s AND C.date = D.date)) as new_tab) / (SElecT risk_level from performance_metrics where transaction_id = %s)*(SElecT risk_level from performance_metrics where transaction_id = %s)) as correlation;'''
         values = [ID1, ID2, ID1, ID2, ID1, ID2, ID1, ID2]
         cur.execute(query, values)
         rv = cur.fetchall()
@@ -348,7 +357,7 @@ def add_watchlist():
 
     # Query for companies (for drop down menu) excluding those which are already in watchlist
     cur = mysql.connection.cursor()
-    query_companies = '''SELECT symbol from company_profile
+    query_companies = '''SElecT symbol from company_profile
 where symbol not in
 (select symbol from watchlist
 where username = %s);
@@ -373,7 +382,7 @@ def delete_watchlist():
 
     # Query for companies (for drop down menu) which are already in watchlist
     cur = mysql.connection.cursor()
-    query_companies = '''SELECT symbol from company_profile
+    query_companies = '''SElecT symbol from company_profile
 where symbol in
 (select symbol from watchlist
 where username = %s);
@@ -396,13 +405,13 @@ where username = %s);
 def current_price(company='all'):
     cur = mysql.connection.cursor()
     if company == 'all':
-        query = '''SELECT date, symbol, LTP, PC FROM historical_data
+        query = '''SElecT date, symbol, LTP, PC FROM historical_data
 order by date;
 '''
         cur.execute(query)
     else:
         company = [company]
-        query = '''SELECT date, symbol, LTP, PC FROM historical_data
+        query = '''SElecT date, symbol, LTP, PC FROM historical_data
         where symbol = %s order by date;
 '''
         cur.execute(query, company)
@@ -439,7 +448,7 @@ order by (A.symbol)'''
         cur.execute(query)
     else:
         company = [company]
-        query = '''SELECT * FROM technical_signals where company = %s'''
+        query = '''SElecT * FROM technical_signals where company = %s'''
         cur.execute(query, company)
     rv = cur.fetchall()
     return render_template('technical.html', values=rv)
