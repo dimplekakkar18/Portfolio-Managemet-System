@@ -4,7 +4,6 @@ create database portfolio;
 use portfolio;
 
 
-
 -- For debugging
 -- drop table company_profile;
 -- drop table company_price;
@@ -37,7 +36,7 @@ primary key(username)
 
 create table company_profile
 (
-symbol varchar(6),
+symbol varchar(10),
 company_name varchar(100) NOT NULL,
 sector varchar(20) NOT NULL,
 market_cap bigint NOT NULL,
@@ -49,7 +48,7 @@ create table transaction_history
 (
 transaction_id int auto_increment,
 username varchar(30) NOT NULL,
-symbol varchar(6) NOT NULL,
+symbol varchar(10) NOT NULL,
 transaction_date datetime NOT NULL,
 quantity int NOT NULL,
 rate float NOT NULL,
@@ -60,7 +59,7 @@ foreign key(username) references user_profile(username)
 
 
 create table performance_metrics(
-transaction_id int auto_increment,
+transaction_id int,
 total_return float,
 annualized_return float,
 risk_level float,
@@ -70,7 +69,7 @@ foreign key(transaction_id) references transaction_history(transaction_id)
 
 create table company_price
 (
-symbol varchar(6),
+symbol varchar(10),
 LTP float NOT NULL,
 PC float NOT NULL,
 primary key(symbol),
@@ -80,7 +79,7 @@ foreign key(symbol) references company_profile(symbol)
 create table historical_data
 (
 date date,
-symbol varchar(6),
+symbol varchar(10),
 LTP float NOT NULL,
 PC float NOT NULL,
 primary key(date,symbol),
@@ -90,7 +89,7 @@ foreign key(symbol) references company_profile(symbol)
 
 create table fundamental_report
 (
-symbol varchar(6),
+symbol varchar(10),
 report_as_of varchar(10),
 EPS float NOT NULL,
 ROE float NOT NULL,
@@ -101,7 +100,7 @@ foreign key (symbol) references company_profile(symbol)
 
 create table technical_signals
 (
-symbol varchar(6),
+symbol varchar(10),
 LTP float,
 RSI float NOT NULL,
 volume float NOT NULL,
@@ -117,7 +116,7 @@ create table news
 news_id int auto_increment,
 title varchar(200) NOT NULL,
 date_of_news date NOT NULL,
-related_company varchar(6),
+related_company varchar(10),
 sources varchar(20),
 primary key(news_id, sources),
 foreign key(related_company) references company_profile(symbol)
@@ -128,7 +127,7 @@ foreign key(related_company) references company_profile(symbol)
 create table  watchlist
 (
 username varchar(30),
-symbol varchar(6),
+symbol varchar(10),
 primary key(username, symbol),
 foreign key(username) references user_profile(username),
 foreign key(symbol) references company_profile(symbol)
@@ -191,6 +190,7 @@ insert into company_price (symbol, LTP, PC) values
 ('GBP/USD', 1222.3, 1220),
 ('USD/JPY', 1500.5, 1499.4),
 ('EUR/USD', 788, 777);
+
 
 insert into historical_data (date, symbol, LTP, PC) values
 ('2023-04-01','SBI', 500, 470),
@@ -335,27 +335,7 @@ INNER JOIN company_price B ON A.symbol = B.symbol
 SET A.LTP = B.LTP
 WHERE A.symbol = B.symbol;
 
-insert into dividend_history values
-('SBI', '76/77', 5, 10),
-('SBI', '75/76', 4, 11),
-('PNG', '76/77', 10, 15),
-('PNG', '75/76', 10, 13),
-('HDFC', '76/77', 0, 0), 
-('HDFC', '75/76', 0, 0),
-('AXISB', '76/77', 20, 10), 
-('AXISB', '75/76', 14, 10),
-('GC', '76/77', 0, 0),
-('GC', '75/76', 0, 0),
-('SI', '76/77', 5, 10),
-('SI', '75/76', 5, 10),
-('PL', '76/77', 11, 5),
-('PL', '75/76', 11, 0),
-('GBP/USD', '76/77', 0, 0),
-('GBP/USD', '75/76', 0, 0),
-('USD/JPY', '76/77', 0, 0),
-('USD/JPY', '75/76', 0, 0),
-('EUR/USD', '76/77', 20, 25),
-('EUR/USD', '75/76', 15, 20);
+
 
 insert into watchlist values
 ('raunak', 'SBI'),
@@ -395,35 +375,35 @@ insert into transaction_history(username, symbol, transaction_date, quantity, ra
 ('raunak', 'USD/JPY', '2021-07-06', -20, 1500);
 
 
-insert into performance_metrics(total_return, annualized_return, risk_level) values
-(((((SElecT rate from transaction_history where transaction_id = 1) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1)))*100,
+insert into performance_metrics(transaction_id,total_return, annualized_return, risk_level) values
+(1,((((SElecT rate from transaction_history where transaction_id = 1) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 1) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 1) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=1))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=1))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=1))),
-(((((SElecT rate from transaction_history where transaction_id = 2) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2)))*100,
+(2,((((SElecT rate from transaction_history where transaction_id = 2) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 2) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 2) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=2))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=2))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=2))),
-(((((SElecT rate from transaction_history where transaction_id = 3) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3)))*100,
+(3,((((SElecT rate from transaction_history where transaction_id = 3) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 3) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 3) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=3))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=3))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=3))),
-(((((SElecT rate from transaction_history where transaction_id = 4) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4)))*100,
+(4,((((SElecT rate from transaction_history where transaction_id = 4) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 4) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 4) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=4))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=4))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=4))),
-(((((SElecT rate from transaction_history where transaction_id = 5) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5)))*100,
+(5,((((SElecT rate from transaction_history where transaction_id = 5) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 5) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 5) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=5))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=5))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=5))),
-(((((SElecT rate from transaction_history where transaction_id = 6) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6)))*100,
+(6,((((SElecT rate from transaction_history where transaction_id = 6) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 6) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 6) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=6))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=6))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=6))),
-(((((SElecT rate from transaction_history where transaction_id = 7) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7)))*100,
+(7,((((SElecT rate from transaction_history where transaction_id = 7) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 7) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 7) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=7))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=7))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=7))),
-(((((SElecT rate from transaction_history where transaction_id = 8) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8)))*100,
+(8,((((SElecT rate from transaction_history where transaction_id = 8) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 8) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 8) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=8))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=8))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=8))),
-(((((SElecT rate from transaction_history where transaction_id = 9) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9)))*100,
+(9,((((SElecT rate from transaction_history where transaction_id = 9) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 9) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 9) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=9))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=9))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=9))),
-(((((SElecT rate from transaction_history where transaction_id = 10) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10)))*100,
+(10,((((SElecT rate from transaction_history where transaction_id = 10) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10)))*100,
 if(((((SElecT rate from transaction_history where transaction_id = 10) -((SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10)))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10)))*100>0,(power(1+(((SElecT rate from transaction_history where transaction_id = 10) -(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10))))/(SElecT LTP from company_price where symbol = (SElecT symbol from transaction_history where transaction_id=10))*100,365/(datediff('2023-04-10',(SElecT transaction_date from transaction_history where transaction_id=10))))-1)*100,0),
 (select stddev(LTP) from historical_data where symbol = (SElecT symbol from transaction_history where transaction_id=10)));
 
@@ -450,6 +430,7 @@ FROM fundamental_report F
 INNER JOIN company_price C
 on F.symbol = C.symbol
 group by(Symbol);
+
 
 -- select * from  fundamental_averaged;
 
@@ -801,4 +782,5 @@ DELIMITER ;
 -- Q20
 
 -- SElecT transaction_id, sector, sum(quantity) as tot_shares from company_profile NATURAL JOIN performance_metrics NATURAL JOIN transaction_history group by sector ;
+
 
